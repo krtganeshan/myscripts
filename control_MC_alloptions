@@ -1,0 +1,70 @@
+! GCMC control file example
+! The code is under construction, and has not yet support for inserting or deleting molecules, so nmatom in the second part of the control file must be set to 1, and followed by a single line with XYZ and atom type.
+      0   iensmb !select MC ensemble (0=Mu-VT with fixed volume, 1=Mu-PT with variable volume)
+ 500000   niter  !number of MC iterations
+  300.0   mctemp !Temperature
+    0.0   mcpres !MC-PT pressure (in GPa, set to zero for incompressible solid systems unless at very high pressures)
+    3.0   rmaxpl !RMax = Max radius for atom placement 
+    1.2   rminpl !RMin = Min radius for atom placement
+      0   igcfac !include GC prefactor in probabilities? 0 = no 1 = yes
+      0   ivol   !select MC volume calculation technique:
+!                !  0: vvacu needed! volume = total volume - occupied volume - specified vacuum volume (vvacu)
+!                !  1:               volume = total cell volume
+!                !  2: vacc needed!  volume = specified accessible volume (vacc)
+!                !  3:               volume = total cell volume - occupied volume
+!                !  4: vacc needed!  volume = specified accessible volume (vacc) - occupied volume
+  435.0   vacc   !if ivol=2 or ivol=4, specify Vacc in angrstoms^3
+    0.0   vvacu  !if ivol=0 specify non-accessible (vacuum) volume Vvacu in angrstoms^3
+   0.25   ivlim  !volume change limit (value between between 0 and 1, Vnew = ((1+ivlim)*V1) 
+      0   debug  !print debug output if set to 1
+      5   nmols  !Number of MC molecule types (number of rows in the following sections must equal the number of atom types
+
+! Molecule Specific Data: C2H2 example
+!    This part is fixed format! 
+!    We need cmpot on line 1, numint on line 2, nmatom on line 3 followed by nmatom lines of coordinates.
+! the coordinates are FIXED FORMAT! (24d.15,1x,A2) x,y,z (24 wide, 15 after decimal), 1 space, 2chars symbol)
+ -75.00   cmpot   !chemical potential of molecule
+      0   numint  !initial number of molecules present in system at the start of the simulation
+      0   numfix  !number of molecules present in system that should not be removed
+      4   nmatom  !number of atoms in molecule
+      12.180480000000000       0.421696000000000       1.316689000000000 C 
+      13.124731000000000       0.376902000000000       0.568360000000000 C 
+      11.349475000000000       0.459560000000000       1.988208000000000 H 
+      13.957314000000000       0.335843000000000      -0.101000000000000 H 
+
+!Molecule Specific Data: C2H4 example
+ -75.00   cmpot   !chemical potential of molecule
+      0   numint  !initial number of molecules present in system at the start of the simulation
+      0   numfix  !number of molecules present in system that should not be removed
+      6   nmatom  !number of atoms in molecule
+      13.989222000000000       0.405391000000000       1.000150000000000 C 
+      13.316784000000000       0.399646000000000       0.885795000000000 C 
+      11.494513000000000       0.461837000000000       1.970612000000000 H 
+      11.335219000000000       0.353577000000000       0.129581000000000 H 
+      13.811701000000000       0.340224000000000      -0.084000000000000 H 
+      13.970561000000000       0.453325000000000       1.756236000000000 H 
+
+!Molecule Specific Data: H2O Example
+ -75.00   cmpot   !chemical potential of molecule
+      0   numint  !initial number of molecules present in system at the start of the simulation
+      0   numfix  !number of molecules present in system that should not be removed
+      3   nmatom  !number of atoms in molecule
+      39.996720000000000      40.747660000000000      40.512210000000000 H 
+      40.000210000000000      39.999520000000000      39.934730000000000 O 
+      40.000030000000000      39.259880000000000      40.523700000000000 H 
+
+!Molecule Specific Data: H2 Example
+ -75.00   cmpot   !chemical potential of molecule
+      0   numint  !initial number of molecules present in system at the start of the simulation
+      0   numfix  !number of molecules present in system that should not be removed
+      2   nmatom  !number of atoms in molecule
+       5.025812000000000      0.0000000000000000       0.000000000000000 H 
+       5.774188000000000      0.0000000000000000       0.000000000000000 H 
+
+!Molecule Specific Data: Single atom example
+ -75.00   cmpot   !chemical potential of molecule
+      0   numint  !initial number of molecules present in system at the start of the simulation
+      0   numfix  !number of molecules present in system that should not be removed
+      1   nmatom  !number of atoms in molecule
+       0.000000000000000      0.0000000000000000       0.000000000000000 H 
+
