@@ -119,7 +119,7 @@ def read_bgf(infile,index):
   return [mol]
 
 
-def writefile(mollist,outfile):
+def writefile(mollist,outfile,description):
   filename,extension    = os.path.splitext(outfile)
   extension = extension.split('.')[-1]
   # Write ase mol to file
@@ -128,11 +128,11 @@ def writefile(mollist,outfile):
   except:
     pass
   if extension == "bgf" or extension == "xmol": 
-    ase2reax(mollist,outfile)
+    ase2reax(mollist,outfile,description)
   else:
     for mol in mollist:
       mol.wrap()   # Wrap atoms 
-      io.write(outfile,mol,format=extension)
+      io.write(outfile,mol,format=extension,append=True)
 
 def convert_lattice(lattice):
   # Takes in a 3x3 cell matrix as per standard convention
@@ -179,7 +179,7 @@ def reax2ase(lattice):
 
 def write_geofile(molecule, filename, description):
     header = ['XTLGRF 200\n']
-    header.append('DESCR ' + str(description) + '\n')
+    header.append('DESCRP ' + str(description) + '\n')
 
     if molecule.align_lattice(convention='reax'):
         log("The lattice supplied for job did not follow the convention required by ReaxFF. I rotated the whole system for you. You're welcome", 3)
@@ -236,11 +236,14 @@ def ase2reax(mollist,outfile,description="converted"):
     for i in range(nat):
       amsmol.add_atom(Atom(symbol=mol.get_chemical_symbols()[i],coords=(mol.positions[i][0],mol.positions[i][1],mol.positions[i][2])))
     amsmol.lattice = mol.cell[:,:]
-    description = description + "%s"%frame
+    if len(mollist) > 1:
+      description_added = description + "%s"%frame
+    else:
+      description_added = description
     if extension == "bgf":
-      write_geofile(amsmol,outfile,description)
+      write_geofile(amsmol,outfile,description_added)
     elif extension == "xmol":
-      write_xmol(amsmol,outfile,description,nat)
+      write_xmol(amsmol,outfile,description_added,nat)
     else:
       print("Error. Write to reax format needs to be .bgf or .xmol only")
       sys.exit(5)
@@ -263,6 +266,7 @@ if __name__ == "__main__":
       index = int(sys.argv[3])
     except:
       index = -2
+    description = "converted"
   else:
     parser = argparse.ArgumentParser()
     parser.add_argument('-i','--input',help='input file with ase format(or xmol/bgf): filename.format, e.g. graphene.xmol')
@@ -271,6 +275,7 @@ if __name__ == "__main__":
                                                -1: last frame,
                                                -2: all frames (default)""")
     parser.add_argument('-s','--supported-formats',action="store_true",help='List help for supported formats')
+    parser.add_argument('-d','--description',help='Description for .xmol and .bgf')
     args = parser.parse_args() 
 
     if args.supported_formats:
@@ -280,7 +285,13 @@ if __name__ == "__main__":
     index = int(args.frame)
     outfile = args.output
 
+    if args.description:
+      description = args.description
+    else:
+      filename, extension = os.path.splitext(infile)
+      description = filename
+
   mollist = readfile(infile,index)
-  writefile(mollist,outfile)
+  writefile(mollist,outfile,description)
 
 
